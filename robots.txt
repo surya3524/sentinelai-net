@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sentinelaidotnet.com/sitemap.xml
