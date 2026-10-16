@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>SentinelAI.AspNetCore</RootNamespace>
+    <Description>ASP.NET Core registration for SentinelAI.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\SentinelAI.Core\SentinelAI.Core.csproj" />
+  </ItemGroup>
+</Project>

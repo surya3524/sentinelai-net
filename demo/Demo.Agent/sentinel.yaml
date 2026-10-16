@@ -1,0 +1,87 @@
+# SentinelAI policy for the demo support agent.
+# enforce: decisions are applied.  audit: decisions are recorded but everything is allowed.
+mode: enforce
+
+prompt_injection:
+  user_input:         { action: block,      threshold: 0.8 }
+  retrieved_document: { action: quarantine, threshold: 0.6 }
+  # Invisible formatting / tag characters have almost no legitimate use in chat or KB text.
+  hidden_unicode_weight: 0.7
+
+secrets: { action: redact }
+pii:     { action: redact }
+
+exfiltration:
+  action: block
+  allowed_domains: [example.com, sentinelaidotnet.com]
+  max_query_length: 32
+
+# Starter signatures only. Regex rules catch the obvious; pair them with an ML scanner
+# (see http_scanners) for paraphrased or novel attacks. Weights combine: 1 - Π(1 - w).
+rules:
+  - id: override-instructions
+    description: Asks the model to discard its instructions
+    pattern: '\b(ignore|disregard|forget|override)\b.{0,40}\b(previous|prior|above|earlier|system|original)\b.{0,20}\b(instructions?|rules|prompt|guidelines)\b'
+    weight: 0.85
+  - id: reveal-system-prompt
+    description: Asks for the hidden system prompt
+    pattern: '\b(reveal|print|show|repeat|output)\b.{0,30}\b(system|hidden|initial)\s+(prompt|instructions)\b'
+    weight: 0.6
+  - id: fake-role-marker
+    description: Chat-template or role markers inside content
+    pattern: '(?m)(<\|?(system|im_start|im_end)\|?>|\[/?INST\]|^\s*#{2,}\s*system\b)'
+    weight: 0.6
+  - id: addressed-to-assistant
+    description: A document giving orders to the AI reading it
+    pattern: '\b(ai|assistant|chatbot|llm|agent)\b\s*[:,]?\s*(you\s+must|you\s+should|always|now|important)\b'
+    weight: 0.5
+    sources: [retrieved_document]
+  - id: tool-directive-in-document
+    description: A document telling the model to call a tool
+    pattern: '\b(call|invoke|run|execute|trigger)\b.{0,25}\b(tool|function|IssueRefund|DeleteAccount|ExportCustomers|SendEmail)\b'
+    weight: 0.55
+    sources: [retrieved_document]
+
+# Plug in external detectors. Each receives { source, content } and returns { score, label }.
+http_scanners: []
+#  - name: promptguard
+#    url: http://localhost:8000/scan
+#    sources: [user_input, retrieved_document]
+#    timeout_ms: 1500
+#    fail_closed: false
+
+# Tools not listed here are blocked.
+tools:
+  LookupOrder:
+    action: allow
+    risk: low
+    ownership_arg: customerId
+
+  IssueRefund:
+    action: allow
+    risk: high
+    ownership_arg: customerId
+    require_user_intent: [refund, money back]
+    amount_arg: amount
+    approval_above: 150
+    max_amount: 500
+
+  DeleteAccount:
+    action: require_approval
+    risk: critical
+    ownership_arg: customerId
+    require_user_intent: [close, delete, cancel]
+
+  ExportCustomers:
+    action: require_approval
+    risk: critical
+    require_user_intent: [export]
+    destination_arg: destination
+    allowed_destinations: [example.com]
+
+  SendEmail:
+    action: allow
+    risk: medium
+    require_user_intent: [email, send]
+    destination_arg: to
+    allowed_destinations: [example.com]

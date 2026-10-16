@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SentinelAI Live Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f1f0eb;--ink:#0d130f;--ink2:#4a524c;--line:#d5d4cb;--card:#fbfaf6;--lime:#c4f25a;--limed:#6f9a10;--dark:#0b100c;--red:#c9302c;--amber:#c98a0e;--blue:#1f6fb2;--green:#2f7d32}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif;height:100vh;display:flex;flex-direction:column;
+ background-image:radial-gradient(#d6d5cb 1px,transparent 1px);background-size:26px 26px}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+button{font:inherit;cursor:pointer}
+header{display:flex;align-items:center;gap:18px;padding:12px 20px;border-bottom:1.5px solid var(--ink);background:var(--bg)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.02em}
+.brand i{width:26px;height:26px;background:var(--ink);color:var(--lime);display:grid;place-items:center;border-radius:5px;font-style:normal;font-size:13px}
+.brand em{font-family:'Instrument Serif',serif;font-weight:400;font-size:20px;color:var(--ink2)}
+.sp{flex:1}
+.toggle{display:flex;align-items:center;gap:10px;padding:6px 8px 6px 14px;border:1.5px solid var(--ink);background:var(--card);font-weight:600}
+.switch{width:52px;height:28px;border-radius:99px;background:#bbb;position:relative;border:0;transition:.2s}
+.switch:after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+.switch[aria-checked=true]{background:var(--limed)}.switch[aria-checked=true]:after{left:27px}
+.switch:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.state-on{color:var(--green)}.state-off{color:var(--red)}
+.hbtn{border:1.5px solid var(--ink);background:transparent;padding:7px 14px;font-weight:600;font-size:14px}
+.hbtn:hover{background:var(--ink);color:#fff}
+.stat{font:500 12px 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.stat b{font-size:16px;color:var(--ink);margin-left:4px}.stat b.bad{color:var(--red)}
+main{flex:1;display:grid;grid-template-columns:290px 1fr 400px;min-height:0}
+section{display:flex;flex-direction:column;min-height:0;border-right:1.5px solid var(--ink)}
+section:last-child{border-right:0}
+.sh{padding:12px 16px;border-bottom:1px solid var(--line);font:500 11.5px 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;background:var(--bg)}
+.scroll{overflow:auto;flex:1;min-height:0}
+/* cases */
+.group{padding:12px 12px 4px}
+.group h4{font:500 11px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);margin:4px 4px 8px}
+.case{all:unset;box-sizing:border-box;display:block;width:100%;cursor:pointer;background:var(--card);border:1.5px solid var(--ink);padding:10px 12px;margin-bottom:8px;transition:.12s}
+.case:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--lime)}
+.case:focus-visible{outline:3px solid var(--blue)}
+.case .t{font-weight:600;font-size:14px;line-height:1.3}
+.case .m{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chip{font:500 10.5px 'JetBrains Mono',monospace;letter-spacing:.04em;padding:1px 7px;border:1px solid var(--line);border-radius:99px;color:var(--ink2);background:#fff}
+.chip.attack{border-color:var(--red);color:var(--red)}.chip.benign{border-color:var(--green);color:var(--green)}
+.empty{padding:14px 16px;color:var(--ink2);font-size:13.5px}
+.empty code{font-size:12px;background:#e6e5dc;padding:1px 4px}
+/* chat */
+#chat{padding:20px;display:flex;flex-direction:column;gap:12px}
+.runh{align-self:center;font:500 11px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);border:1px solid var(--line);background:var(--card);padding:3px 10px;margin-top:6px}
+.runh.off{border-color:var(--red);color:var(--red)}
+.msg{max-width:78%;padding:11px 15px;white-space:pre-wrap;word-break:break-word}
+.msg.user{align-self:flex-end;background:var(--ink);color:#fff}
+.msg.bot{align-self:flex-start;background:var(--card);border:1.5px solid var(--ink)}
+.msg.bot.blocked{border-color:var(--red)}
+.red{background:var(--lime);font:500 12px 'JetBrains Mono',monospace;padding:0 4px}
+.leak{display:block;margin-top:8px;padding:6px 10px;background:#fde8e7;border-left:3px solid var(--red);font:12px 'JetBrains Mono',monospace;color:var(--red)}
+.approval{align-self:flex-start;max-width:78%;border:1.5px solid var(--blue);background:#eef5fb;padding:14px 16px}
+.approval h5{font-size:14px;margin-bottom:4px;color:var(--blue)}
+.approval code{display:block;font:12.5px 'JetBrains Mono',monospace;margin:6px 0 10px;word-break:break-all}
+.approval p{font-size:13px;color:var(--ink2);margin-bottom:10px}
+.approval button{border:1.5px solid var(--ink);padding:6px 14px;font-weight:600;margin-right:8px;background:#fff}
+.approval button.ok{background:var(--ink);color:#fff}
+.approval .res{font-size:13px;font-weight:600}
+form{display:flex;gap:10px;padding:14px 16px;border-top:1.5px solid var(--ink);background:var(--bg)}
+form input{flex:1;border:1.5px solid var(--ink);padding:11px 14px;font:inherit;background:#fff}
+form input:focus{outline:3px solid var(--lime);outline-offset:0}
+form button{border:1.5px solid var(--ink);background:var(--ink);color:#fff;padding:0 20px;font-weight:600}
+.intro{margin:auto;text-align:center;max-width:420px;color:var(--ink2)}
+.intro h2{font-size:30px;letter-spacing:-.03em;color:var(--ink);line-height:1.1;margin-bottom:10px}
+.intro h2 em{font-family:'Instrument Serif',serif;font-weight:400;background:var(--lime);padding:0 6px}
+/* timeline */
+.tl{background:var(--dark);color:#d9e4d6}
+.tl .sh{background:var(--dark);color:#9aa89a;border-color:#243026}
+#timeline{padding:12px}
+.trun{font:500 11px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--lime);margin:14px 2px 8px;display:flex;justify-content:space-between}
+.trun:first-child{margin-top:2px}
+.step{border:1px solid #243026;background:#121912;padding:10px 12px;margin-bottom:8px;animation:in .3s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.step .r{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.step .stage{font:500 10.5px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:#6f7f70}
+.step .ttl{font-weight:600;font-size:13.5px;color:#fff;margin:2px 0}
+.step .d{font-size:12.5px;color:#9aa89a;word-break:break-word}
+.step ul{list-style:none;padding:0;margin-top:6px;font:11.5px 'JetBrains Mono',monospace;color:#b9c7b6}
+.step li:before{content:"› ";color:var(--lime)}
+.badge{font:500 10.5px 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;white-space:nowrap}
+.b-allow,.b-ok{background:#1f3a20;color:#8fe39a}
+.b-redact{background:var(--lime);color:var(--ink)}
+.b-require_approval{background:#173a5a;color:#9fd0ff}
+.b-quarantine{background:#4a3507;color:#ffd27a}
+.b-block{background:var(--red);color:#fff}
+.b-unchecked,.b-compromised{background:transparent;color:#ff8a85;border:1px solid #ff8a85}
+.b-none,.b-info{background:#243026;color:#9aa89a}
+/* state */
+.stateb{border-top:1px solid #243026;max-height:42%;display:flex;flex-direction:column}
+#state{padding:10px 14px;font-size:13px}
+#state h6{font:500 10.5px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:#6f7f70;margin:8px 0 6px}
+.acct{display:flex;justify-content:space-between;padding:3px 0;color:#cfdccc}
+.acct .closed{color:#ff8a85;font-weight:600}
+.eff{padding:5px 8px;margin-bottom:5px;border-left:3px solid #2f7d32;background:#121912;color:#cfdccc;font-size:12.5px}
+.eff.damage{border-color:var(--red);background:#2a1312;color:#ffc9c6}
+dialog{border:1.5px solid var(--ink);padding:0;max-width:760px;width:92vw;background:var(--card)}
+dialog::backdrop{background:rgba(13,19,15,.5)}
+dialog pre{margin:0;padding:18px;max-height:70vh;overflow:auto;background:var(--dark);color:#cfe0cb;font:12.5px/1.6 'JetBrains Mono',monospace}
+dialog .dh{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-weight:700}
+@media(max-width:1100px){main{grid-template-columns:1fr;overflow:auto}section{border-right:0;border-bottom:1.5px solid var(--ink);min-height:420px}body{height:auto}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><i>◈</i>SentinelAI <em>live demo</em></div>
+  <div class="toggle">Sentinel <span id="pl" class="state-on">ON</span>
+    <button class="switch" id="prot" role="switch" aria-checked="true" aria-label="Sentinel protection"></button></div>
+  <span class="stat">Stopped<b id="sStop">0</b></span>
+  <span class="stat">Damage<b id="sDmg">0</b></span>
+  <span class="sp"></span>
+  <button class="hbtn" id="policyBtn">Policy</button>
+  <button class="hbtn" id="resetBtn">Reset</button>
+</header>
+<main>
+  <section>
+    <div class="sh">Scenarios <span id="count"></span></div>
+    <div class="scroll" id="cases"></div>
+  </section>
+  <section>
+    <div class="sh">Support agent · signed in as alice (C-1001)</div>
+    <div class="scroll" id="chatWrap"><div id="chat"><div class="intro" id="intro"><h2>Run a scenario, then <em>flip the switch.</em></h2><p>Each one runs through input scanning, retrieval, the model, the tool firewall and output scanning. Turn Sentinel off to see the same agent unguarded.</p></div></div></div>
+    <form id="f"><input id="msg" placeholder="Or type to the agent… e.g. Where is my order O-5001?" autocomplete="off" aria-label="Message"><button>Send</button></form>
+  </section>
+  <section class="tl">
+    <div class="sh">Security timeline <span id="live">● live</span></div>
+    <div class="scroll" id="timeline"></div>
+    <div class="stateb"><div class="sh">System state</div><div class="scroll" id="state"></div></div>
+  </section>
+</main>
+<dialog id="dlg"><div class="dh">sentinel.yaml <button class="hbtn" onclick="dlg.close()">Close</button></div><pre id="pol"></pre></dialog>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let protection=true, stopped=0;
+const groups={control:'Controls (should pass)',tool:'Tool firewall',output:'Output scanning',direct:'Direct injection',indirect:'Indirect / RAG injection',multi_turn:'Multi-turn',other:'Other'};
+
+// protection switch
+const sw=$('#prot');
+sw.onclick=()=>{protection=!protection;sw.setAttribute('aria-checked',protection);const l=$('#pl');l.textContent=protection?'ON':'OFF';l.className=protection?'state-on':'state-off'};
+
+// scenarios
+let lastCases='';
+async function loadCases(){
+  const raw=await (await fetch('/api/cases')).text();
+  if(raw===lastCases)return;
+  lastCases=raw;const cases=JSON.parse(raw);
+  const box=$('#cases');box.innerHTML='';$('#count').textContent=cases.length;
+  const by={};cases.forEach(c=>(by[groups[c.category]?c.category:'other']??=[]).push(c));
+  for(const k of Object.keys(groups)){
+    if(!by[k])continue;
+    const g=document.createElement('div');g.className='group';g.innerHTML=`<h4>${groups[k]}</h4>`;
+    by[k].forEach(c=>{
+      const b=document.createElement('button');b.className='case';
+      b.innerHTML=`<div class="t">${esc(c.title)}</div><div class="m"><span class="chip ${c.kind==='attack'?'attack':'benign'}">${esc(c.kind)}</span>${c.technique?`<span class="chip">${esc(c.technique)}</span>`:''}${c.expected?`<span class="chip">expect ${esc(c.expected)}</span>`:''}</div>`;
+      b.title=[c.reference,c.notes].filter(Boolean).join(' · ');
+      b.onclick=()=>run({caseId:c.id});g.append(b);
+    });
+    box.append(g);
+  }
+  if(!by.direct&&!by.indirect&&!by.multi_turn){
+    const e=document.createElement('div');e.className='empty';
+    e.innerHTML='No prompt-injection cases loaded yet. Add a JSON file of cases from a published benchmark or your red-team tool to <code>demo/Demo.Agent/cases/</code> — it appears here without a restart.';
+    box.append(e);
+  }
+}
+
+async function run(body){
+  const r=await fetch('/api/run',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...body,protection,pace:true})});
+  if(!r.ok)alert(await r.text());
+}
+$('#f').onsubmit=e=>{e.preventDefault();const m=$('#msg').value.trim();if(!m)return;$('#msg').value='';run({message:m})};
+
+// chat rendering
+const chat=$('#chat'), wrap=$('#chatWrap');
+function add(el){$('#intro')?.remove();chat.append(el);wrap.scrollTop=wrap.scrollHeight}
+function bubble(cls,html){const d=document.createElement('div');d.className='msg '+cls;d.innerHTML=html;add(d);return d}
+function renderReply(text){
+  let h=esc(text).replace(/\[REDACTED:([A-Z_]+)\]/g,'<span class="red">REDACTED · $1</span>');
+  // Never render images from model output: show what a browser would have fetched instead.
+  h=h.replace(/!\[[^\]]*\]\(([^)\s]+)[^)]*\)/g,(m,u)=>`<span class="leak">⚠ auto-loading image → ${u}</span>`);
+  return h;
+}
+
+// timeline
+const tl=$('#timeline');
+function stepEl(s){
+  const d=document.createElement('div');d.className='step';
+  const f=(s.findings||[]).filter(x=>x.rule!=='combined-score').slice(0,5);
+  d.innerHTML=`<div class="r"><span class="stage">${esc(s.stage)}</span><span class="badge b-${esc(s.action.split(' ')[0])}">${esc(s.action.replace('_',' '))}</span></div>
+   <div class="ttl">${esc(s.title)}</div><div class="d">${esc(s.detail)}</div>
+   ${f.length?`<ul>${f.map(x=>`<li>${esc(x.scanner)}/${esc(x.rule)} ${(+x.confidence).toFixed(2)}${x.detail?' — '+esc(x.detail):''}</li>`).join('')}</ul>`:''}`;
+  tl.append(d);tl.parentElement.scrollTop=tl.parentElement.scrollHeight;
+}
+
+// state
+function renderState(s){
+  const dmg=s.effects.filter(e=>e.severity==='damage').length;
+  const sd=$('#sDmg');sd.textContent=dmg;sd.className=dmg?'bad':'';
+  $('#state').innerHTML=`<h6>Accounts</h6>${s.customers.map(c=>`<div class="acct"><span>${esc(c.id)} · ${esc(c.name)}</span><span class="${c.status==='closed'?'closed':''}">${esc(c.status)}</span></div>`).join('')}
+   <h6>What actually happened</h6>${s.effects.length?s.effects.slice().reverse().map(e=>`<div class="eff ${e.severity}">${e.severity==='damage'?'✗ ':'✓ '}${esc(e.text)}</div>`).join(''):'<div class="acct">Nothing yet.</div>'}`;
+}
+
+// live events
+function connect(){
+  const es=new EventSource('/api/events');
+  es.onopen=()=>{$('#live').textContent='● live';$('#live').style.color='var(--lime)'};
+  es.onerror=()=>{$('#live').textContent='○ reconnecting';$('#live').style.color='#ff8a85'};
+  es.addEventListener('run',e=>{
+    const r=JSON.parse(e.data);
+    const h=document.createElement('div');h.className='runh'+(r.protection?'':' off');h.textContent=`${r.title} · Sentinel ${r.protection?'on':'off'}`;add(h);
+    r.turns.forEach(t=>bubble('user',esc(t)));
+    const th=document.createElement('div');th.className='trun';th.innerHTML=`<span>${esc(r.title)}</span><span>${r.protection?'protected':'unprotected'}</span>`;tl.append(th);
+  });
+  es.addEventListener('step',e=>{
+    const s=JSON.parse(e.data);stepEl(s);
+    if(/^(block|quarantine)/.test(s.action)){stopped++;$('#sStop').textContent=stopped}
+  });
+  es.addEventListener('done',e=>{
+    const d=JSON.parse(e.data);
+    bubble('bot'+(d.outcome==='block'?' blocked':''),renderReply(d.reply));
+  });
+  es.addEventListener('approval',e=>{
+    const a=JSON.parse(e.data);
+    const c=document.createElement('div');c.className='approval';c.id='ap-'+a.id;
+    c.innerHTML=`<h5>Approval required · ${esc(a.tool)}</h5><code>${esc(a.call)}</code><p>${esc(a.reason)}</p><div class="act"><button class="ok">Approve</button><button>Reject</button></div>`;
+    const [ok,no]=c.querySelectorAll('button');
+    ok.onclick=()=>fetch(`/api/approvals/${a.id}/approve`,{method:'POST'});
+    no.onclick=()=>fetch(`/api/approvals/${a.id}/reject`,{method:'POST'});
+    add(c);
+  });
+  es.addEventListener('approval_resolved',e=>{
+    const r=JSON.parse(e.data);const c=document.getElementById('ap-'+r.id);
+    if(c)c.querySelector('.act').outerHTML=`<div class="res">${r.approve?'✓ Approved':'✗ Rejected'} — ${esc(r.result)}</div>`;
+  });
+  es.addEventListener('state',e=>renderState(JSON.parse(e.data)));
+}
+
+$('#policyBtn').onclick=async()=>{$('#pol').textContent=await (await fetch('/api/policy')).text();$('#dlg').showModal()};
+$('#resetBtn').onclick=async()=>{await fetch('/api/reset',{method:'POST'});chat.innerHTML='';tl.innerHTML='';stopped=0;$('#sStop').textContent=0};
+
+loadCases();
+fetch('/api/state').then(r=>r.json()).then(renderState);
+connect();
+setInterval(loadCases,5000); // pick up new case files while presenting
+</script>
+</body>
+</html>
