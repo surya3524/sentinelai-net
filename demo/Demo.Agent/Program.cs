@@ -20,6 +20,12 @@ app.MapDefaultEndpoints();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
+// The UI's app.js and app.css are shared with the WebAssembly demo and live in demo/ui
+// (copied next to the app on publish).
+var uiDir = new[] { Path.Combine(app.Environment.ContentRootPath, "ui"), Path.Combine(app.Environment.ContentRootPath, "..", "ui") }
+    .First(Directory.Exists);
+app.UseStaticFiles(new StaticFileOptions { FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(Path.GetFullPath(uiDir)) });
+
 var api = app.MapGroup("/api");
 
 api.MapGet("/cases", (CaseCatalog cases) => cases.Load());

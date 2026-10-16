@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SentinelAI Live Demo</title>
+<meta name="description" content="Try SentinelAI.NET in your browser: run attacks against a support agent and watch the security checks live.">
+<!-- The deploy workflow rewrites this to the folder the demo is served from. -->
+<base href="/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="app"><div class="boot">Loading the .NET runtime…</div></div>
+<div id="blazor-root" hidden></div>
+<script>
+// WebAssembly transport: the same calls as the server demo, answered by .NET in this tab.
+let readyResolve;
+const ready = new Promise(r => readyResolve = r);
+let onEventHandler = null;
+window.sentinelBridge = {
+  ready(ref) { window.sentinelBridge.ref = ref; readyResolve(); },
+  emit(type, json) { onEventHandler?.(type, JSON.parse(json)); },
+};
+const call = (method, ...args) => ready.then(() => window.sentinelBridge.ref.invokeMethodAsync(method, ...args));
+window.sentinelTransport = {
+  label: 'live demo',
+  note: 'Runs in your browser',
+  homeUrl: 'https://sentinelaidotnet.com/',
+  cases: () => call('GetCases'),
+  run: body => call('Run', JSON.stringify(body)),
+  approve: (id, verdict) => call('Approve', id, verdict === 'approve'),
+  state: () => call('GetState').then(JSON.parse),
+  reset: () => call('Reset'),
+  policy: () => call('GetPolicy'),
+  subscribe(onEvent, onStatus) { onEventHandler = onEvent; ready.then(() => onStatus(true)); },
+};
+</script>
+<script src="_framework/blazor.webassembly.js"></script>
+<script>
+// Wait for the shell to be replaced only once .NET is up, so the loading message stays visible.
+ready.then(() => { const s = document.createElement('script'); s.src = 'app.js'; document.body.append(s); });
+</script>
+</body>
+</html>

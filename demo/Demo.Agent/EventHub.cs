@@ -5,7 +5,7 @@ using System.Threading.Channels;
 namespace Demo.Agent;
 
 /// <summary>Fans out server-sent events to every open browser tab.</summary>
-public sealed class EventHub
+public sealed class EventHub : IDemoEvents
 {
     private readonly ConcurrentDictionary<Guid, Channel<string>> _subscribers = new();
 

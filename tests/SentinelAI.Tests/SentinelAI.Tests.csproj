@@ -12,6 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\SentinelAI.Core\SentinelAI.Core.csproj" />
-    <ProjectReference Include="..\..\demo\Demo.Agent\Demo.Agent.csproj" />
+    <ProjectReference Include="..\..\demo\Demo.Core\Demo.Core.csproj" />
   </ItemGroup>
 </Project>

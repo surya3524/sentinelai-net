@@ -1,6 +1,6 @@
 # SentinelAI.NET
 
-**Website:** https://sentinelaidotnet.com (source in [`docs/`](docs/), served by GitHub Pages)
+**Website:** https://sentinelaidotnet.com · **Try it in your browser:** https://sentinelaidotnet.com/demo/
 
 Runtime security for .NET AI apps and agents: scan prompts, retrieved documents and model
 output, authorize tool calls, and emit OpenTelemetry evidence.
@@ -19,6 +19,19 @@ dotnet run --project demo/Demo.AppHost
 
 To run without Aspire: `dotnet run --project demo/Demo.Agent` (UI only, no dashboard).
 
+### In-browser version
+
+The same agent and the real SentinelAI library compiled to WebAssembly, so it runs entirely in
+the visitor's browser with no server. Each visitor gets their own fake data. This is what the
+website serves at `/demo/`. To run it locally:
+
+```bash
+dotnet run --project demo/Demo.Browser
+```
+
+Differences from the server demo: no Aspire dashboard, and case files are compiled in at build
+time, so new files appear after a rebuild instead of live.
+
 Run the tests, which put every case file through the pipeline:
 
 ```bash
@@ -31,10 +44,14 @@ dotnet test
 |---|---|
 | `src/SentinelAI.Core` | Policy (YAML), scanners, `SentinelEngine`, `ToolGuard`, telemetry |
 | `src/SentinelAI.AspNetCore` | `services.AddSentinelAI()` |
-| `demo/Demo.Agent` | Support agent, fake data, live UI, `sentinel.yaml`, `cases/` |
+| `demo/Demo.Core` | The support agent: pipeline, simulated model, fake data, case loading |
+| `demo/Demo.Agent` | Server demo (HTTP + live events), `sentinel.yaml`, `cases/` |
+| `demo/Demo.Browser` | In-browser (WebAssembly) demo |
+| `demo/ui` | UI shared by both demos |
 | `demo/Demo.AppHost` | Aspire host and dashboard |
 | `tests/SentinelAI.Tests` | Scanner, tool-guard and case tests |
 | `docs/` | Website (sentinelaidotnet.com) |
+| `.github/workflows/pages.yml` | On push to main: test, build the WebAssembly demo, deploy site + demo |
 
 ## How the demo works
 

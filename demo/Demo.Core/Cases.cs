@@ -30,18 +30,23 @@ public sealed record CaseEffect(string? Output = null, CaseToolCall? ToolCall = 
 public sealed record CaseToolCall(string Name, Dictionary<string, JsonElement> Arguments);
 
 /// <summary>
-/// Loads every *.json file in the cases folder on each request, so edits show up live
-/// while presenting. Each file holds { "cases": [ ... ] }.
+/// Case files, each holding { "cases": [ ... ] }. The source is re-read on every Load, so
+/// with a folder source, edits show up live while presenting.
 /// </summary>
-public sealed class CaseCatalog(string directory)
+public sealed class CaseCatalog(Func<IEnumerable<string>> readFiles)
 {
+    /// <summary>Every *.json file in a folder, in name order.</summary>
+    public CaseCatalog(string directory)
+        : this(() => Directory.Exists(directory)
+            ? Directory.EnumerateFiles(directory, "*.json").Order().Select(File.ReadAllText)
+            : []) { }
+
     public IReadOnlyList<AttackCase> Load()
     {
-        if (!Directory.Exists(directory)) return [];
         var all = new List<AttackCase>();
-        foreach (var file in Directory.EnumerateFiles(directory, "*.json").Order())
+        foreach (var json in readFiles())
         {
-            var doc = JsonSerializer.Deserialize<CaseFile>(File.ReadAllText(file), Json.Options);
+            var doc = JsonSerializer.Deserialize<CaseFile>(json, Json.Options);
             if (doc?.Cases is null) continue;
             all.AddRange(doc.Cases.Where(c => c.Turns is { Count: > 0 }));
         }

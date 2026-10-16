@@ -22,7 +22,7 @@ public class CaseTests(ITestOutputHelper output)
     {
         var policy = PolicyLoader.FromFile(Paths.DemoPolicy);
         var store = new FakeStore();
-        var agent = new AgentPipeline(SentinelEngine.CreateDefault(policy), new ToolGuard(policy), store, new CaseCatalog(Paths.Cases), new EventHub());
+        var agent = new AgentPipeline(SentinelEngine.CreateDefault(policy), new ToolGuard(policy), store, new CaseCatalog(Paths.Cases), new NullEvents());
         return (agent, store);
     }
 
@@ -62,4 +62,9 @@ public class CaseTests(ITestOutputHelper output)
     {
         Assert.True(new CaseCatalog(Paths.Cases).Load().Count >= 10);
     }
+}
+
+internal sealed class NullEvents : IDemoEvents
+{
+    public void Publish(string type, object payload) { }
 }

@@ -1,0 +1,58 @@
+# Tests the code, builds the in-browser demo, and publishes it with the website:
+#   docs/                      -> https://sentinelaidotnet.com/
+#   demo/Demo.Browser (WASM)   -> https://sentinelaidotnet.com/demo/
+name: Build and deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Test
+        run: dotnet test
+
+      - name: Publish in-browser demo
+        run: dotnet publish demo/Demo.Browser -c Release -o out
+
+      - name: Assemble site
+        run: |
+          cp -r docs site
+          cp -r out/wwwroot site/demo
+          sed -i 's|<base href="/">|<base href="/demo/">|' site/demo/index.html
+          grep -q '<base href="/demo/">' site/demo/index.html
+          touch site/.nojekyll
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -19,7 +19,7 @@ public sealed record RunResult(string RunId, string Reply, string Outcome, bool 
 /// The support agent: input → retrieval → model → tool → output. With protection on,
 /// SentinelAI checks every hop; with it off, the same agent runs unguarded.
 /// </summary>
-public sealed partial class AgentPipeline(SentinelEngine engine, ToolGuard guard, FakeStore store, CaseCatalog catalog, EventHub hub)
+public sealed partial class AgentPipeline(SentinelEngine engine, ToolGuard guard, FakeStore store, CaseCatalog catalog, IDemoEvents hub)
 {
     public static readonly ActivitySource Source = new("Demo.Agent");
     private const string AgentId = "support-agent";
