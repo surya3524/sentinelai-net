@@ -2,6 +2,10 @@
 
 **Website:** https://sentinelaidotnet.com · **Try it in your browser:** https://sentinelaidotnet.com/demo/
 
+[![NuGet](https://img.shields.io/nuget/vpre/SentinelAI.Extensions.AI?label=SentinelAI.Extensions.AI)](https://www.nuget.org/packages/SentinelAI.Extensions.AI)
+[![NuGet](https://img.shields.io/nuget/vpre/SentinelAI.AspNetCore?label=SentinelAI.AspNetCore)](https://www.nuget.org/packages/SentinelAI.AspNetCore)
+[![NuGet](https://img.shields.io/nuget/vpre/SentinelAI.Core?label=SentinelAI.Core)](https://www.nuget.org/packages/SentinelAI.Core)
+
 Runtime security for .NET AI apps and agents: scan prompts, retrieved documents and model
 output, authorize tool calls, and emit OpenTelemetry evidence.
 
