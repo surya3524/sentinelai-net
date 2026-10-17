@@ -18,8 +18,12 @@ public sealed record ToolCall(string Name, IReadOnlyDictionary<string, JsonEleme
     }
 }
 
-/// <summary>Who is acting. Supplied by your app from its authenticated session, never by the model.</summary>
-public sealed record ToolCallerContext(string UserId, string? CustomerId, string? AgentId, string LatestUserMessage);
+/// <summary>
+/// Who is acting. Supplied by your app from its authenticated session, never by the model.
+/// <paramref name="OwnerId"/> is the id that a tool's <c>ownership_arg</c> must equal
+/// (a customer, tenant or account id).
+/// </summary>
+public sealed record ToolCallerContext(string UserId, string? OwnerId, string? AgentId, string LatestUserMessage);
 
 /// <summary>
 /// Deterministic authorization for agent tool calls. Runs after the model proposes a call
@@ -57,9 +61,9 @@ public sealed class ToolGuard(SentinelPolicy policy)
         if (tool.OwnershipArg is { } ownerArg)
         {
             var target = call.GetString(ownerArg);
-            if (caller.CustomerId is null || !string.Equals(target, caller.CustomerId, StringComparison.OrdinalIgnoreCase))
+            if (caller.OwnerId is null || !string.Equals(target, caller.OwnerId, StringComparison.OrdinalIgnoreCase))
                 return Decide(SecurityAction.Block, "ownership",
-                    $"{ownerArg}={target ?? "(missing)"} does not belong to caller {caller.UserId} ({caller.CustomerId ?? "no customer"})");
+                    $"{ownerArg}={target ?? "(missing)"} does not belong to caller {caller.UserId} ({caller.OwnerId ?? "no owner id"})");
         }
 
         if (tool.RequireUserIntent.Count > 0 &&

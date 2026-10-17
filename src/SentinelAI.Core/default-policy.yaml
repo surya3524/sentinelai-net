@@ -1,0 +1,47 @@
+# SentinelAI built-in default policy, used when no sentinel.yaml is found.
+# Copy this file to sentinel.yaml in your app and edit it. In particular, add your tools:
+# tools that are not listed are blocked.
+mode: enforce
+
+prompt_injection:
+  user_input:         { action: block,      threshold: 0.8 }
+  retrieved_document: { action: quarantine, threshold: 0.6 }
+  hidden_unicode_weight: 0.7
+
+secrets: { action: redact }
+pii:     { action: redact }
+
+exfiltration:
+  action: block
+  allowed_domains: []
+  max_query_length: 32
+
+# Starter signatures only: they catch obvious attacks, not paraphrased ones.
+# Add an ML classifier under http_scanners for real prompt-injection coverage.
+rules:
+  - id: override-instructions
+    description: Asks the model to discard its instructions
+    pattern: '\b(ignore|disregard|forget|override)\b.{0,40}\b(previous|prior|above|earlier|system|original)\b.{0,20}\b(instructions?|rules|prompt|guidelines)\b'
+    weight: 0.85
+  - id: reveal-system-prompt
+    description: Asks for the hidden system prompt
+    pattern: '\b(reveal|print|show|repeat|output)\b.{0,30}\b(system|hidden|initial)\s+(prompt|instructions)\b'
+    weight: 0.6
+  - id: fake-role-marker
+    description: Chat-template or role markers inside content
+    pattern: '(?m)(<\|?(system|im_start|im_end)\|?>|\[/?INST\]|^\s*#{2,}\s*system\b)'
+    weight: 0.6
+  - id: addressed-to-assistant
+    description: A document giving orders to the AI reading it
+    pattern: '\b(ai|assistant|chatbot|llm|agent)\b\s*[:,]?\s*(you\s+must|you\s+should|always|now|important)\b'
+    weight: 0.5
+    sources: [retrieved_document]
+  - id: tool-directive-in-document
+    description: A document telling the model to call a tool
+    pattern: '\b(call|invoke|run|execute|trigger)\b.{0,25}\b(tool|function)\b'
+    weight: 0.55
+    sources: [retrieved_document]
+
+http_scanners: []
+
+tools: {}

@@ -1,6 +1,5 @@
 using Demo.Agent;
 using SentinelAI;
-using SentinelAI.AspNetCore;
 using SentinelAI.Tools;
 
 var builder = WebApplication.CreateBuilder(args);

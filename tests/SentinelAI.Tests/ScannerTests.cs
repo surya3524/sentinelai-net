@@ -117,3 +117,34 @@ public class ScannerTests
 
     private static ToolCallerContext Caller(string message) => new("alice", "C-1001", "test", message);
 }
+
+public class PolicyLoaderTests
+{
+    [Fact]
+    public void Omitting_rules_keeps_the_starter_rules()
+    {
+        var policy = PolicyLoader.FromYaml("tools:\n  GetOrder: { action: allow }\n");
+        Assert.Equal(PolicyLoader.Default().Rules.Select(r => r.Id), policy.Rules.Select(r => r.Id));
+    }
+
+    [Fact]
+    public void Empty_rules_list_turns_them_off()
+    {
+        Assert.Empty(PolicyLoader.FromYaml("rules: []\n").Rules);
+    }
+
+    [Fact]
+    public void Unknown_keys_are_an_error()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => PolicyLoader.FromYaml("promptInjection:\n  user_input: { action: block }\n"));
+        Assert.Contains("line 1", ex.Message);
+    }
+
+    [Fact]
+    public void Empty_file_is_the_defaults()
+    {
+        var policy = PolicyLoader.FromYaml("");
+        Assert.NotEmpty(policy.Rules);
+        Assert.Empty(policy.Tools);
+    }
+}

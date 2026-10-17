@@ -1,3 +1,5 @@
+using YamlDotNet.Core;
+using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -5,21 +7,61 @@ namespace SentinelAI.Policy;
 
 public static class PolicyLoader
 {
+    // Unknown keys are an error: in a security policy, a typo must not silently disable a control.
     private static readonly IDeserializer Yaml = new DeserializerBuilder()
         .WithNamingConvention(UnderscoredNamingConvention.Instance)
-        .IgnoreUnmatchedProperties()
         .Build();
 
-    public static SentinelPolicy FromYaml(string yaml)
+    /// <summary>
+    /// Parses a policy. Omitted settings keep their defaults; an omitted <c>rules</c> key keeps the
+    /// built-in starter rules (write <c>rules: []</c> to turn them off).
+    /// </summary>
+    public static SentinelPolicy FromYaml(string yaml) => Parse(yaml, inheritDefaultRules: true);
+
+    public static SentinelPolicy FromFile(string path) => FromYaml(File.ReadAllText(path));
+
+    /// <summary>The built-in policy: starter rules, redaction on, and no tools allowed.</summary>
+    public static SentinelPolicy Default() => Parse(DefaultYaml, inheritDefaultRules: false);
+
+    private static SentinelPolicy Parse(string yaml, bool inheritDefaultRules)
     {
-        var policy = Yaml.Deserialize<SentinelPolicy>(yaml) ?? new SentinelPolicy();
+        SentinelPolicy policy;
+        try
+        {
+            policy = Yaml.Deserialize<SentinelPolicy>(yaml) ?? new SentinelPolicy();
+        }
+        catch (YamlException ex)
+        {
+            throw new InvalidOperationException($"Invalid SentinelAI policy at line {ex.Start.Line}: {(ex.InnerException ?? ex).Message}", ex);
+        }
+
+        if (inheritDefaultRules && !HasTopLevelKey(yaml, "rules")) policy.Rules = Default().Rules;
+
         // YAML deserialization replaces the dictionary, losing the case-insensitive comparer.
         policy.Tools = new Dictionary<string, ToolPolicy>(policy.Tools, StringComparer.OrdinalIgnoreCase);
         Validate(policy);
         return policy;
     }
 
-    public static SentinelPolicy FromFile(string path) => FromYaml(File.ReadAllText(path));
+    private static bool HasTopLevelKey(string yaml, string key)
+    {
+        var stream = new YamlStream();
+        stream.Load(new StringReader(yaml));
+        return stream.Documents.Count > 0
+            && stream.Documents[0].RootNode is YamlMappingNode map
+            && map.Children.Keys.OfType<YamlScalarNode>().Any(k => k.Value == key);
+    }
+
+    /// <summary>The built-in policy as YAML, a starting point for your own sentinel.yaml.</summary>
+    public static string DefaultYaml
+    {
+        get
+        {
+            using var stream = typeof(PolicyLoader).Assembly.GetManifestResourceStream("SentinelAI.default-policy.yaml")
+                ?? throw new InvalidOperationException("Built-in policy resource is missing.");
+            return new StreamReader(stream).ReadToEnd();
+        }
+    }
 
     public static SecurityAction ParseAction(string value) => value.Trim().ToLowerInvariant() switch
     {

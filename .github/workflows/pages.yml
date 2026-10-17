@@ -30,6 +30,12 @@ jobs:
       - name: Test
         run: dotnet test
 
+      - name: Check the packages build
+        run: |
+          for p in src/SentinelAI.Core src/SentinelAI.AspNetCore src/SentinelAI.Extensions.AI; do
+            dotnet pack "$p" -c Release -o packages
+          done
+
       - name: Publish in-browser demo
         run: dotnet publish demo/Demo.Browser -c Release -o out
 

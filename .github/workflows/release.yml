@@ -1,0 +1,57 @@
+# Publishes the NuGet packages when a version tag is pushed:
+#   git tag v0.1.0-preview.1 && git push origin v0.1.0-preview.1
+#
+# Uses nuget.org trusted publishing, so no API key is stored in GitHub. One-time setup:
+#   1. On nuget.org: your account → Trusted Publishing → add a policy for
+#      repository surya3524/sentinelai-net, workflow file release.yml.
+#   2. In GitHub: Settings → Secrets and variables → Actions → Variables →
+#      add NUGET_USER = your nuget.org username.
+name: Release packages
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write   # create the GitHub release
+  id-token: write   # exchange for a short-lived nuget.org API key
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]] || { echo "Tag $GITHUB_REF_NAME is not vX.Y.Z[-suffix]"; exit 1; }
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Test
+        run: dotnet test -c Release
+
+      - name: Pack
+        run: |
+          for p in src/SentinelAI.Core src/SentinelAI.AspNetCore src/SentinelAI.Extensions.AI; do
+            dotnet pack "$p" -c Release -o packages -p:Version="$VERSION"
+          done
+
+      - uses: NuGet/login@v1
+        id: nuget
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Push to nuget.org
+        run: dotnet nuget push "packages/*.nupkg" --api-key "${{ steps.nuget.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PRERELEASE=""; [[ "$VERSION" == *-* ]] && PRERELEASE="--prerelease"
+          gh release create "$GITHUB_REF_NAME" packages/*.nupkg --title "$GITHUB_REF_NAME" --generate-notes $PRERELEASE

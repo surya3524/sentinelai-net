@@ -1,11 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>SentinelAI</RootNamespace>
-    <Description>Policy engine, scanners, tool-call firewall and OpenTelemetry events for .NET AI apps.</Description>
+    <Description>Runtime security for .NET AI apps and agents: YAML policy, prompt-injection, secret, PII and exfiltration scanners, a tool-call firewall, and OpenTelemetry security events.</Description>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="YamlDotNet" Version="18.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.10" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.10" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.10" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="default-policy.yaml" LogicalName="SentinelAI.default-policy.yaml" />
   </ItemGroup>
 </Project>

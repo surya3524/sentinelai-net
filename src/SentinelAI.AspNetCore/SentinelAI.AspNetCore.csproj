@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>SentinelAI.AspNetCore</RootNamespace>
-    <Description>ASP.NET Core registration for SentinelAI.</Description>
+    <Description>SentinelAI for ASP.NET Core: take the caller for tool authorization from the signed-in user, and scan prompts in minimal API requests with an endpoint filter.</Description>
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

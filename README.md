@@ -5,6 +5,41 @@
 Runtime security for .NET AI apps and agents: scan prompts, retrieved documents and model
 output, authorize tool calls, and emit OpenTelemetry evidence.
 
+> **Preview (0.1).** The API may change before 1.0.
+
+## Use it in your app
+
+```bash
+dotnet add package SentinelAI.Extensions.AI --prerelease
+dotnet add package SentinelAI.AspNetCore --prerelease   # optional: caller from the signed-in user
+```
+
+```csharp
+builder.Services.AddSentinelAI()                  // loads sentinel.yaml (built-in default if missing)
+    .AddHttpContextCaller(o => o.OwnerIdClaims = ["customer_id"]);
+
+builder.Services.AddChatClient(innerChatClient)   // Azure OpenAI, OpenAI, Ollama, …
+    .UseSentinel()                                // before UseFunctionInvocation()
+    .UseFunctionInvocation();
+```
+
+Then list the tools your agent may call in `sentinel.yaml`, since tools that aren't listed are blocked.
+See the [Extensions.AI package README](src/SentinelAI.Extensions.AI/README.md) for the policy format,
+approvals and what each stage does.
+
+| Package | Use it for |
+|---|---|
+| [`SentinelAI.Extensions.AI`](src/SentinelAI.Extensions.AI) | `.UseSentinel()` for any `IChatClient` |
+| [`SentinelAI.AspNetCore`](src/SentinelAI.AspNetCore) | Caller from user claims; `.ScanWithSentinel<T>()` endpoint filter |
+| [`SentinelAI.Core`](src/SentinelAI.Core) | The engine on its own: policy, scanners, `ToolGuard`, telemetry |
+
+### Releasing
+
+Push a tag: `git tag v0.1.0-preview.1 && git push origin v0.1.0-preview.1`. The
+[release workflow](.github/workflows/release.yml) tests, packs and publishes to nuget.org with
+trusted publishing, then creates a GitHub release. One-time setup is described at the top of
+that file.
+
 ## Run the demo
 
 Requires the .NET 9 SDK. No API key, no Docker.
@@ -42,8 +77,9 @@ dotnet test
 
 | Path | What it is |
 |---|---|
-| `src/SentinelAI.Core` | Policy (YAML), scanners, `SentinelEngine`, `ToolGuard`, telemetry |
-| `src/SentinelAI.AspNetCore` | `services.AddSentinelAI()` |
+| `src/SentinelAI.Core` | Policy (YAML), scanners, `SentinelEngine`, `ToolGuard`, telemetry (package) |
+| `src/SentinelAI.AspNetCore` | ASP.NET Core integration (package) |
+| `src/SentinelAI.Extensions.AI` | `IChatClient` integration (package) |
 | `demo/Demo.Core` | The support agent: pipeline, simulated model, fake data, case loading |
 | `demo/Demo.Agent` | Server demo (HTTP + live events), `sentinel.yaml`, `cases/` |
 | `demo/Demo.Browser` | In-browser (WebAssembly) demo |
