@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SentinelAI API Firewall Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f1f0eb;--ink:#0d130f;--ink2:#4a524c;--line:#d5d4cb;--card:#fbfaf6;--lime:#c4f25a;--limed:#6f9a10;--dark:#0b100c;--red:#c9302c;--amber:#c98a0e;--blue:#1f6fb2;--green:#2f7d32}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif;background-image:radial-gradient(#d6d5cb 1px,transparent 1px);background-size:26px 26px}
+#app{min-height:100vh;display:flex;flex-direction:column}
+button{font:inherit;cursor:pointer}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:12px 20px;border-bottom:1.5px solid var(--ink)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;white-space:nowrap}
+.brand i{width:26px;height:26px;background:var(--ink);color:var(--lime);display:grid;place-items:center;border-radius:5px;font-style:normal;font-size:13px}
+.brand em{font-family:'Instrument Serif',serif;font-weight:400;font-size:20px;color:var(--ink2)}
+.toggle{display:flex;align-items:center;gap:10px;padding:6px 8px 6px 14px;border:1.5px solid var(--ink);background:var(--card);font-weight:600;white-space:nowrap}
+.switch{width:52px;height:28px;border-radius:99px;background:#bbb;position:relative;border:0;transition:.2s}
+.switch:after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+.switch[aria-checked=true]{background:var(--limed)}.switch[aria-checked=true]:after{left:27px}
+.switch:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.on{color:var(--green)}.off{color:var(--red)}
+.sp{flex:1}
+.hbtn{border:1.5px solid var(--ink);background:transparent;padding:7px 14px;font-weight:600;font-size:14px;color:inherit;text-decoration:none;white-space:nowrap}
+.hbtn:hover{background:var(--ink);color:#fff}
+main{flex:1;display:grid;grid-template-columns:300px 1fr 420px;min-height:0}
+section{display:flex;flex-direction:column;border-right:1.5px solid var(--ink);min-height:0}
+section:last-child{border-right:0}
+.sh{padding:12px 16px;border-bottom:1px solid var(--line);font:500 11.5px 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;display:flex;justify-content:space-between}
+.list{padding:12px;overflow:auto}
+.s{all:unset;box-sizing:border-box;display:block;width:100%;cursor:pointer;background:var(--card);border:1.5px solid var(--ink);padding:10px 12px;margin-bottom:8px}
+.s:hover,.s.sel{box-shadow:4px 4px 0 var(--lime);transform:translate(-2px,-2px)}
+.s:focus-visible{outline:3px solid var(--blue)}
+.s .t{font-weight:600;font-size:14px;line-height:1.3}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chip{font:500 10.5px 'JetBrains Mono',monospace;padding:1px 7px;border:1px solid var(--line);border-radius:99px;color:var(--ink2);background:#fff}
+.chip.attack{border-color:var(--red);color:var(--red)}.chip.benign{border-color:var(--green);color:var(--green)}
+.editor{padding:16px;display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
+.req{font:500 13px 'JetBrains Mono',monospace;background:var(--ink);color:var(--lime);padding:8px 12px}
+.notes{font-size:13.5px;color:var(--ink2)}
+textarea{flex:1;min-height:260px;border:1.5px solid var(--ink);background:#fff;padding:14px;font:13px/1.6 'JetBrains Mono',monospace;resize:vertical}
+textarea:focus{outline:3px solid var(--lime)}
+.bin{border:1.5px dashed var(--ink2);padding:18px;font-size:13.5px;color:var(--ink2);background:#fff}
+.send{align-self:flex-start;border:1.5px solid var(--ink);background:var(--ink);color:#fff;padding:12px 22px;font-weight:600}
+.send:hover{box-shadow:4px 4px 0 var(--lime)}
+.dark{background:var(--dark);color:#d9e4d6}
+.dark .sh{color:#9aa89a;border-color:#243026}
+.out{padding:14px;overflow:auto;flex:1}
+.status{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.code{font:600 22px 'JetBrains Mono',monospace}
+.badge{font:500 11px 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px}
+.ok{background:#1f3a20;color:#8fe39a}.blocked{background:var(--red);color:#fff}.held{background:#4a3507;color:#ffd27a}
+pre{background:#05080a;border:1px solid #243026;padding:12px;font:12px/1.6 'JetBrains Mono',monospace;color:#cfe0cb;white-space:pre-wrap;word-break:break-word;margin-bottom:14px}
+h6{font:500 10.5px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:#6f7f70;margin:6px 0 8px}
+.eff{padding:8px 10px;margin-bottom:6px;border-left:3px solid var(--green);background:#121912;font-size:13px}
+.eff.damage{border-color:var(--red);background:#2a1312;color:#ffc9c6}
+.empty{color:#6f7f70;font-size:13.5px}
+dialog{border:1.5px solid var(--ink);padding:0;max-width:760px;width:92vw;background:var(--card)}
+dialog::backdrop{background:rgba(13,19,15,.5)}
+dialog pre{margin:0;max-height:70vh;overflow:auto;border:0}
+dialog .dh{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-weight:700}
+@media(max-width:1100px){main{grid-template-columns:1fr}section{border-right:0;border-bottom:1.5px solid var(--ink)}.list{max-height:280px}}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <div class="brand"><i>◈</i>SentinelAI <em>API firewall demo</em></div>
+  <div class="toggle">Firewall <span id="fl" class="on">ON</span><button class="switch" id="fw" role="switch" aria-checked="true" aria-label="API firewall"></button></div>
+  <span class="sp"></span>
+  <button class="hbtn" id="policyBtn">Policy</button>
+</header>
+<main>
+  <section>
+    <div class="sh">Uploads <span id="count"></span></div>
+    <div class="list" id="samples"></div>
+  </section>
+  <section>
+    <div class="sh">Dataset hub API</div>
+    <div class="editor">
+      <div class="req">POST /datasets/imdb-reviews/config · multipart upload: <span id="fname">config.yaml</span></div>
+      <p class="notes" id="notes"></p>
+      <textarea id="content" spellcheck="false" aria-label="Upload content"></textarea>
+      <div class="bin" id="binary" hidden>Binary upload (zip archive). Content can't be edited here.</div>
+      <button class="send" id="send">Upload config →</button>
+    </div>
+  </section>
+  <section class="dark">
+    <div class="sh">Result</div>
+    <div class="out" id="out"><p class="empty">Pick an upload and send it. Then flip the firewall off and send it again.</p></div>
+  </section>
+</main>
+</div>
+<dialog id="dlg"><div class="dh">sentinel.yaml <button class="hbtn" id="close">Close</button></div><pre id="pol"></pre></dialog>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let samples = [], current = null, firewall = true;
+
+const sw = $('#fw');
+function showFirewall() {
+  sw.setAttribute('aria-checked', firewall);
+  $('#fl').textContent = firewall ? 'ON' : 'OFF';
+  $('#fl').className = firewall ? 'on' : 'off';
+}
+sw.onclick = async () => {
+  const r = await fetch(`/demo/firewall/${firewall ? 'off' : 'on'}`, {method: 'POST'});
+  firewall = (await r.json()).firewall; showFirewall();
+};
+
+function pick(s, button) {
+  current = s;
+  document.querySelectorAll('.s').forEach(b => b.classList.toggle('sel', b === button));
+  $('#fname').textContent = s.fileName;
+  $('#notes').textContent = s.notes;
+  $('#content').hidden = !s.editable; $('#binary').hidden = s.editable;
+  if (s.editable) $('#content').value = new TextDecoder().decode(Uint8Array.from(atob(s.contentBase64), c => c.charCodeAt(0)));
+}
+
+async function send() {
+  if (!current) return;
+  const bytes = current.editable ? new TextEncoder().encode($('#content').value)
+                                 : Uint8Array.from(atob(current.contentBase64), c => c.charCodeAt(0));
+  const form = new FormData();
+  form.append('config', new Blob([bytes]), current.fileName);
+  const r = await fetch('/datasets/imdb-reviews/config', {method: 'POST', body: form});
+  const body = await r.json().catch(() => ({}));
+  render(r.status, body);
+}
+
+function render(status, body) {
+  const held = body.title === 'Request held for review';
+  const badge = status === 200 ? '<span class="badge ok">accepted</span>'
+              : held ? '<span class="badge held">quarantined</span>' : '<span class="badge blocked">blocked</span>';
+  let html = `<div class="status"><span class="code">${status}</span>${badge}<span>firewall ${firewall ? 'on' : 'off'}</span></div>`;
+  if (status !== 200) {
+    html += `<h6>Response to the uploader</h6><pre>${esc(JSON.stringify({title: body.title, detail: body.detail, traceId: body.traceId}, null, 2))}</pre>`;
+    html += `<h6>Findings</h6>${(body.findings || []).map(f => `<div class="eff damage">${esc(f.category)} / ${esc(f.rule)}<br><small>${esc(f.location)}</small></div>`).join('')}`;
+    html += `<h6>Worker</h6><div class="eff">Never saw the upload.${held ? ' A copy is kept in sentinel-quarantine/ for review.' : ''}</div>`;
+  } else {
+    html += `<h6>What the worker did</h6>${(body.worker || []).map(e => `<div class="eff ${e.severity}">${e.severity === 'damage' ? '✗ ' : '✓ '}${esc(e.text)}</div>`).join('')}`;
+  }
+  $('#out').innerHTML = html;
+}
+
+$('#send').onclick = send;
+$('#policyBtn').onclick = async () => { $('#pol').textContent = await (await fetch('/demo/policy')).text(); $('#dlg').showModal(); };
+$('#close').onclick = () => $('#dlg').close();
+
+(async () => {
+  samples = await (await fetch('/demo/samples')).json();
+  firewall = (await (await fetch('/demo/state')).json()).firewall; showFirewall();
+  $('#count').textContent = samples.length;
+  const list = $('#samples');
+  for (const s of samples) {
+    const b = document.createElement('button'); b.className = 's';
+    b.innerHTML = `<div class="t">${esc(s.title)}</div><div class="chips"><span class="chip ${s.kind}">${esc(s.kind)}</span><span class="chip">${esc(s.technique)}</span></div>`;
+    b.onclick = () => pick(s, b);
+    list.append(b);
+  }
+  pick(samples[0], list.firstChild);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+# SentinelAI policy for the dataset-hub demo API.
+mode: enforce
+
+api_firewall:
+  # Demo only: show why a request was blocked. Keep this off in production.
+  expose_details: true
+  max_body_bytes: 2097152
+
+  endpoints:
+    # Dataset config uploads: the Hugging Face pattern.
+    - path: /datasets/*/config
+      methods: [POST]
+      content_types: [multipart/form-data]
+      uploads:
+        allowed_extensions: [.yaml, .yml, .json, .zip]
+        max_bytes: 1048576
+        schema_file: schemas/dataset-config.schema.json
+        quarantine: true
+
+    - path: /datasets/search
+      content_types: [application/json]
+      schema_file: schemas/search.schema.json
+
+  # Hold suspicious uploads for review instead of just rejecting them.
+  detectors:
+    template_injection: quarantine
+    unsafe_deserialization: quarantine

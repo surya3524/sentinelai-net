@@ -6,12 +6,33 @@
 [![NuGet](https://img.shields.io/nuget/vpre/SentinelAI.AspNetCore?label=SentinelAI.AspNetCore)](https://www.nuget.org/packages/SentinelAI.AspNetCore)
 [![NuGet](https://img.shields.io/nuget/vpre/SentinelAI.Core?label=SentinelAI.Core)](https://www.nuget.org/packages/SentinelAI.Core)
 
-Runtime security for .NET AI apps and agents: scan prompts, retrieved documents and model
-output, authorize tool calls, and emit OpenTelemetry evidence.
+Runtime security for .NET APIs and AI apps:
+
+- **API firewall:** stop requests and uploads that carry code-execution or data-access payloads
+  (template injection, unsafe deserialization, dangerous URLs/SSRF, path traversal, schema
+  violations) before your endpoints or background workers process them.
+- **AI app protection:** scan prompts, retrieved documents and model output, authorize every tool
+  call an AI agent makes, and emit OpenTelemetry evidence.
 
 > **Preview (0.1).** The API may change before 1.0.
 
-## Use it in your app
+## Protect an API
+
+```bash
+dotnet add package SentinelAI.ApiFirewall --prerelease   # in the next release
+```
+
+```csharp
+builder.Services.AddSentinelAI();     // reads sentinel.yaml
+app.UseSentinelFirewall();
+```
+
+Define per-endpoint schemas and upload rules in the `api_firewall:` section of `sentinel.yaml`.
+See the [ApiFirewall package README](src/SentinelAI.ApiFirewall/README.md). To see it stop an upload
+shaped like the Hugging Face dataset-config attack, run `dotnet run --project demo/Demo.Api` and open
+http://localhost:5090.
+
+## Protect an AI app
 
 ```bash
 dotnet add package SentinelAI.Extensions.AI --prerelease
@@ -33,6 +54,7 @@ approvals and what each stage does.
 
 | Package | Use it for |
 |---|---|
+| [`SentinelAI.ApiFirewall`](src/SentinelAI.ApiFirewall) | Request firewall for any ASP.NET Core API (next release) |
 | [`SentinelAI.Extensions.AI`](src/SentinelAI.Extensions.AI) | `.UseSentinel()` for any `IChatClient` |
 | [`SentinelAI.AspNetCore`](src/SentinelAI.AspNetCore) | Caller from user claims; `.ScanWithSentinel<T>()` endpoint filter |
 | [`SentinelAI.Core`](src/SentinelAI.Core) | The engine on its own: policy, scanners, `ToolGuard`, telemetry |
@@ -51,6 +73,8 @@ Requires the .NET 9 SDK. No API key, no Docker.
 ```bash
 dotnet run --project demo/Demo.AppHost
 ```
+
+This starts both demos: the AI support agent and the API firewall's dataset hub.
 
 - **Demo UI:** http://localhost:5080. Run a scenario, then flip the Sentinel switch and run it again.
 - **Aspire dashboard:** the login link is printed in the console. Open **Traces** to see every
@@ -84,8 +108,10 @@ dotnet test
 | `src/SentinelAI.Core` | Policy (YAML), scanners, `SentinelEngine`, `ToolGuard`, telemetry (package) |
 | `src/SentinelAI.AspNetCore` | ASP.NET Core integration (package) |
 | `src/SentinelAI.Extensions.AI` | `IChatClient` integration (package) |
+| `src/SentinelAI.ApiFirewall` | ASP.NET Core request firewall (package) |
 | `demo/Demo.Core` | The support agent: pipeline, simulated model, fake data, case loading |
 | `demo/Demo.Agent` | Server demo (HTTP + live events), `sentinel.yaml`, `cases/` |
+| `demo/Demo.Api` | API firewall demo: dataset hub with a simulated (never executing) upload worker |
 | `demo/Demo.Browser` | In-browser (WebAssembly) demo |
 | `demo/ui` | UI shared by both demos |
 | `demo/Demo.AppHost` | Aspire host and dashboard |

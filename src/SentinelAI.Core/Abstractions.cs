@@ -7,6 +7,8 @@ public enum ContentSource
     RetrievedDocument,
     ModelOutput,
     ToolCall,
+    /// <summary>An incoming HTTP request inspected by the API firewall.</summary>
+    ApiRequest,
 }
 
 /// <summary>Ordered by severity: a higher value wins when findings disagree.</summary>
@@ -27,6 +29,15 @@ public static class FindingCategory
     public const string Pii = "pii";
     public const string Exfiltration = "exfiltration";
     public const string ToolPolicy = "tool_policy";
+
+    // API firewall
+    public const string TemplateInjection = "template_injection";
+    public const string UnsafeDeserialization = "unsafe_deserialization";
+    public const string DangerousUrl = "dangerous_url";
+    public const string PathTraversal = "path_traversal";
+    public const string CommandInjection = "command_injection";
+    public const string SchemaViolation = "schema_violation";
+    public const string RequestLimit = "request_limit";
 }
 
 public sealed record SecurityScanContext(

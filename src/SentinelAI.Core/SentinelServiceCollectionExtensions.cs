@@ -85,6 +85,7 @@ public static class SentinelServiceCollectionExtensions
         services.TryAddSingleton(sp => new SentinelEngine(
             sp.GetRequiredService<SentinelPolicy>(), sp.GetRequiredService<IEnumerable<IAiSecurityScanner>>()));
         services.TryAddSingleton(sp => new ToolGuard(sp.GetRequiredService<SentinelPolicy>()));
+        services.TryAddSingleton(sp => new SentinelAI.Firewall.FirewallEngine(sp.GetRequiredService<SentinelPolicy>()));
         return new SentinelBuilder(services);
     }
 

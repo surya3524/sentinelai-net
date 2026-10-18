@@ -1,0 +1,25 @@
+{
+  "$comment": "What a dataset config may contain. Anything else is rejected before the worker sees it.",
+  "type": "object",
+  "required": ["name", "data_files"],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": "string", "maxLength": 64, "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "description": { "type": "string", "maxLength": 2000 },
+    "data_files": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": ["path"],
+        "additionalProperties": false,
+        "properties": {
+          "path": { "type": "string", "maxLength": 256, "pattern": "^[A-Za-z0-9_][A-Za-z0-9_./-]*$" },
+          "split": { "enum": ["train", "validation", "test"] },
+          "offset": { "type": "integer", "minimum": 0 },
+          "length": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  }
+}

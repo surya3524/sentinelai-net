@@ -18,7 +18,12 @@ public static class PolicyLoader
     /// </summary>
     public static SentinelPolicy FromYaml(string yaml) => Parse(yaml, inheritDefaultRules: true);
 
-    public static SentinelPolicy FromFile(string path) => FromYaml(File.ReadAllText(path));
+    public static SentinelPolicy FromFile(string path)
+    {
+        var policy = FromYaml(File.ReadAllText(path));
+        policy.BaseDirectory = Path.GetDirectoryName(Path.GetFullPath(path));
+        return policy;
+    }
 
     /// <summary>The built-in policy: starter rules, redaction on, and no tools allowed.</summary>
     public static SentinelPolicy Default() => Parse(DefaultYaml, inheritDefaultRules: false);
@@ -79,6 +84,7 @@ public static class PolicyLoader
         "retrieved_document" => ContentSource.RetrievedDocument,
         "model_output" => ContentSource.ModelOutput,
         "tool_call" => ContentSource.ToolCall,
+        "api_request" => ContentSource.ApiRequest,
         _ => throw new InvalidOperationException($"Unknown content source '{value}'."),
     };
 
@@ -88,6 +94,7 @@ public static class PolicyLoader
         ContentSource.RetrievedDocument => "retrieved_document",
         ContentSource.ModelOutput => "model_output",
         ContentSource.ToolCall => "tool_call",
+        ContentSource.ApiRequest => "api_request",
         _ => source.ToString(),
     };
 
@@ -104,6 +111,7 @@ public static class PolicyLoader
             if (a is SecurityAction.Redact or SecurityAction.Quarantine)
                 throw new InvalidOperationException($"Tool '{name}': action must be allow, require_approval or block.");
         }
+        Firewall.ApiFirewallPolicy.Validate(p.ApiFirewall);
         foreach (var r in p.Rules)
         {
             if (string.IsNullOrWhiteSpace(r.Id) || string.IsNullOrWhiteSpace(r.Pattern))

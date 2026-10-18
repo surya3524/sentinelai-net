@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>SentinelAI.ApiFirewall</RootNamespace>
+    <Description>A request firewall for ASP.NET Core APIs: inspects JSON, YAML, form data and uploaded files (including zip archives) for template injection, unsafe deserialization, dangerous URLs and SSRF, path traversal and schema violations, before your code or background workers process them.</Description>
+    <PackageTags>security;api;firewall;waf;aspnetcore;ssrf;template-injection;deserialization;path-traversal;uploads;opentelemetry</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\SentinelAI.Core\SentinelAI.Core.csproj" />
+  </ItemGroup>
+</Project>

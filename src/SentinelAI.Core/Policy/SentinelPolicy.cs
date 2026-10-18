@@ -16,6 +16,13 @@ public sealed class SentinelPolicy
     /// <summary>Tool name → policy. Tools not listed are blocked (default deny).</summary>
     public Dictionary<string, ToolPolicy> Tools { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>Inspection of incoming API requests and uploads (SentinelAI.ApiFirewall).</summary>
+    public Firewall.ApiFirewallPolicy ApiFirewall { get; set; } = new();
+
+    /// <summary>Folder relative paths in the policy (such as schema files) resolve against. Set by <see cref="PolicyLoader.FromFile"/>.</summary>
+    [YamlDotNet.Serialization.YamlIgnore]
+    public string? BaseDirectory { get; set; }
+
     public bool IsAudit => string.Equals(Mode, "audit", StringComparison.OrdinalIgnoreCase);
 }
 
