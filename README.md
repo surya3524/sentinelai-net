@@ -2,6 +2,7 @@
 
 **Website:** https://sentinelaidotnet.com · **Try it in your browser:** https://sentinelaidotnet.com/demo/
 
+[![NuGet](https://img.shields.io/nuget/vpre/SentinelAI.ApiFirewall?label=SentinelAI.ApiFirewall)](https://www.nuget.org/packages/SentinelAI.ApiFirewall)
 [![NuGet](https://img.shields.io/nuget/vpre/SentinelAI.Extensions.AI?label=SentinelAI.Extensions.AI)](https://www.nuget.org/packages/SentinelAI.Extensions.AI)
 [![NuGet](https://img.shields.io/nuget/vpre/SentinelAI.AspNetCore?label=SentinelAI.AspNetCore)](https://www.nuget.org/packages/SentinelAI.AspNetCore)
 [![NuGet](https://img.shields.io/nuget/vpre/SentinelAI.Core?label=SentinelAI.Core)](https://www.nuget.org/packages/SentinelAI.Core)
@@ -14,12 +15,12 @@ Runtime security for .NET APIs and AI apps:
 - **AI app protection:** scan prompts, retrieved documents and model output, authorize every tool
   call an AI agent makes, and emit OpenTelemetry evidence.
 
-> **Preview (0.1).** The API may change before 1.0.
+> **Preview (0.2).** The API may change before 1.0.
 
 ## Protect an API
 
 ```bash
-dotnet add package SentinelAI.ApiFirewall --prerelease   # in the next release
+dotnet add package SentinelAI.ApiFirewall --prerelease
 ```
 
 ```csharp
@@ -54,14 +55,14 @@ approvals and what each stage does.
 
 | Package | Use it for |
 |---|---|
-| [`SentinelAI.ApiFirewall`](src/SentinelAI.ApiFirewall) | Request firewall for any ASP.NET Core API (next release) |
+| [`SentinelAI.ApiFirewall`](src/SentinelAI.ApiFirewall) | Request firewall for any ASP.NET Core API |
 | [`SentinelAI.Extensions.AI`](src/SentinelAI.Extensions.AI) | `.UseSentinel()` for any `IChatClient` |
 | [`SentinelAI.AspNetCore`](src/SentinelAI.AspNetCore) | Caller from user claims; `.ScanWithSentinel<T>()` endpoint filter |
 | [`SentinelAI.Core`](src/SentinelAI.Core) | The engine on its own: policy, scanners, `ToolGuard`, telemetry |
 
 ### Releasing
 
-Push a tag: `git tag v0.1.0-preview.1 && git push origin v0.1.0-preview.1`. The
+Push a tag, for example `git tag v0.2.0-preview.1 && git push origin v0.2.0-preview.1`. The
 [release workflow](.github/workflows/release.yml) tests, packs and publishes to nuget.org with
 trusted publishing, then creates a GitHub release. One-time setup is described at the top of
 that file.
