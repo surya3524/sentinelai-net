@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SentinelAI.NET — Runtime security for .NET AI</title>
-<meta name="description" content="Open-source, OpenTelemetry-native security gateway for .NET AI applications and agents.">
+<title>SentinelAI.NET — Runtime security for .NET APIs and AI</title>
+<meta name="description" content="Open-source runtime security for .NET: an API firewall that stops code-execution payloads in requests and uploads, plus protection for AI apps and agents.">
 <link rel="canonical" href="https://sentinelaidotnet.com/">
 <meta name="robots" content="index,follow">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SentinelAI.NET">
-<meta property="og:title" content="SentinelAI.NET — Runtime security for .NET AI">
-<meta property="og:description" content="Open-source, OpenTelemetry-native security gateway for .NET AI applications and agents.">
+<meta property="og:title" content="SentinelAI.NET — Runtime security for .NET APIs and AI">
+<meta property="og:description" content="Open-source runtime security for .NET: an API firewall that stops code-execution payloads in requests and uploads, plus protection for AI apps and agents.">
 <meta property="og:url" content="https://sentinelaidotnet.com/">
 <meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#f1f0eb">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d130f'/%3E%3Cpath d='M16 6l8 10-8 10-8-10z' fill='%23c4f25a'/%3E%3C/svg%3E">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SentinelAI.NET","applicationCategory":"DeveloperApplication","operatingSystem":"Cross-platform","description":"Open-source runtime security for .NET AI applications and agents, as a Microsoft.Extensions.AI pipeline step.","url":"https://sentinelaidotnet.com/","codeRepository":"https://github.com/surya3524/sentinelai-net","downloadUrl":"https://www.nuget.org/packages/SentinelAI.Extensions.AI","softwareVersion":"0.1.0-preview.1","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SentinelAI.NET","applicationCategory":"DeveloperApplication","operatingSystem":"Cross-platform","description":"Open-source runtime security for .NET: an API firewall that stops code-execution payloads in requests and uploads, plus protection for AI apps and agents.","url":"https://sentinelaidotnet.com/","codeRepository":"https://github.com/surya3524/sentinelai-net","downloadUrl":"https://www.nuget.org/profiles/Surya_Teja_Meesala","softwareVersion":"0.2.0-preview.1","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -161,9 +161,9 @@ footer a:hover{text-decoration:underline}
 <nav><div class="wrap">
   <a class="brand" href="#"><span class="mark">◈</span>SentinelAI.NET</a>
   <ul>
-    <li><a href="#loop">How it works</a></li><li><a href="#capabilities">Capabilities</a></li>
+    <li><a href="#firewall">API firewall</a></li><li><a href="#loop">AI apps</a></li><li><a href="#capabilities">Capabilities</a></li>
     <li><a href="/demo/">Live demo ↗</a></li><li><a href="#start">Quick start</a></li>
-    <li><a href="#compare">Why Sentinel</a></li><li><a href="#roadmap">Roadmap</a></li><li><a href="https://www.nuget.org/packages/SentinelAI.Extensions.AI">NuGet ↗</a></li>
+    <li><a href="#compare">Why Sentinel</a></li><li><a href="#roadmap">Roadmap</a></li><li><a href="https://www.nuget.org/profiles/Surya_Teja_Meesala">NuGet ↗</a></li>
   </ul>
   <a class="btn sm" href="https://github.com/surya3524/sentinelai-net">GitHub ↗</a>
 </div></nav>
@@ -171,10 +171,10 @@ footer a:hover{text-decoration:underline}
 <header class="hero"><div class="wrap">
   <div>
     <div class="eyebrow">Building in the open</div>
-    <h1>Secure every <span class="hl serif">AI call</span> before it does damage.</h1>
-    <p>SentinelAI.NET is open-source runtime security for .NET AI apps and agents. Add one step to your <code style="font-size:.85em">IChatClient</code> pipeline: it inspects prompts, tool calls, tool results and model output, enforces policy, and emits OpenTelemetry evidence.</p>
-    <div class="btns"><a class="btn dark" href="/demo/">Try the live demo →</a><a class="btn" href="#start">Get started</a></div>
-    <div class="ticks"><span>.NET native</span><span>Bring your own scanners</span><span>Self-hosted</span></div>
+    <h1>Stop the request <span class="hl serif">before it runs code.</span></h1>
+    <p>SentinelAI.NET is open-source runtime security for .NET. Its <b>API firewall</b> inspects requests and uploads for code-execution and data-access payloads before your endpoints or workers touch them. Its <b>AI layer</b> guards prompts, tool calls and model output.</p>
+    <div class="btns"><a class="btn dark" href="#firewall">See the API firewall →</a><a class="btn" href="/demo/">Try the AI demo</a></div>
+    <div class="ticks"><span>.NET native</span><span>One policy file</span><span>Self-hosted</span><span>OpenTelemetry</span></div>
   </div>
   <div class="panel">
     <div class="ph"><span>CHECKPOINT / 01</span><b>● ENFORCING</b></div>
@@ -199,9 +199,37 @@ footer a:hover{text-decoration:underline}
 
 <div class="strip"><div class="wrap"><span><i>●</i> Allow</span><span><i>●</i> Redact</span><span><i>●</i> Block</span><span><i>●</i> Require approval</span><span><i>●</i> Trace everything</span></div></div>
 
+<section id="firewall"><div class="wrap">
+  <div class="head2" style="margin-bottom:34px">
+    <div><div class="eyebrow">API firewall · new in 0.2</div><h2>The attack hides <span class="serif">in the data.</span></h2></div>
+    <p class="sub">Attacks like the Hugging Face dataset-config exploit don’t look like attacks. A config arrives through a normal upload API with a template expression where a number belongs, and a background worker later evaluates it. SentinelAI.ApiFirewall inspects every request and upload before anything processes it.</p>
+  </div>
+  <div class="two">
+    <div><div class="fname">Uploaded config.yaml</div>
+<pre><span class="k1">name</span>: imdb-reviews
+<span class="k1">data_files</span>:
+  - <span class="k1">path</span>: <span class="s1">"reference://"</span>      <span class="c1"># loader follows attacker refs</span>
+    <span class="k1">offset</span>: <span class="s1">"{{ 7 * 7 }}"</span>     <span class="c1"># a template where a number belongs</span></pre></div>
+    <div><div class="fname">SentinelAI says · 400, held for review</div>
+<pre><span class="c1">// the worker never sees the upload</span>
+schema_violation    data_files[0].offset: expected integer
+template_injection  data_files[0].offset
+dangerous_url       data_files[0].path: reference:// URL</pre></div>
+  </div>
+  <div class="cap" style="margin-top:34px">
+    <div class="card" style="cursor:default"><div class="k"><span>Shape</span></div><h3>Schemas per endpoint</h3><ul><li>Wrong types and unknown fields</li><li>Sizes, lengths, patterns</li><li>Uploads, by file type</li></ul></div>
+    <div class="card" style="cursor:default"><div class="k"><span>Code execution</span></div><h3>Injection detectors</h3><ul><li>Template expressions</li><li>YAML tags, type hints, serialized objects</li><li>Shell syntax (recorded)</li></ul></div>
+    <div class="card" style="cursor:default"><div class="k"><span>Reach</span></div><h3>URLs and paths</h3><ul><li>file://, reference://, gopher://…</li><li>Internal and cloud-metadata hosts (SSRF)</li><li>../ traversal and zip slip</li></ul></div>
+    <div class="card" style="cursor:default"><div class="k"><span>Hiding places</span></div><h3>Everywhere, decoded</h3><ul><li>Query, JSON, YAML, forms, files</li><li>Files inside zip archives</li><li>URL-encoded, base64, JSON-in-strings</li></ul></div>
+    <div class="card" style="cursor:default"><div class="k"><span>Abuse</span></div><h3>Limits</h3><ul><li>Zip and YAML alias bombs</li><li>Depth, size, value count</li><li>Duplicate JSON keys</li></ul></div>
+    <div class="card" style="cursor:default"><div class="k"><span>Evidence</span></div><h3>Decide and record</h3><ul><li>Block, quarantine or audit</li><li>No details leaked to callers</li><li>OpenTelemetry events</li></ul></div>
+  </div>
+  <div class="btns" style="margin-top:30px"><code style="background:var(--ink);color:var(--lime);padding:12px 16px;font:13.5px 'JetBrains Mono',monospace">dotnet add package SentinelAI.ApiFirewall --prerelease</code><a class="btn" href="https://www.nuget.org/packages/SentinelAI.ApiFirewall">View on NuGet ↗</a><a class="btn" href="https://github.com/surya3524/sentinelai-net/tree/main/demo/Demo.Api">Run the demo ↗</a></div>
+</div></section>
+
 <section class="dark-s" id="loop"><div class="wrap">
   <div class="head2">
-    <div><div class="eyebrow">The enforcement loop</div><h2>One loop, <span class="serif" style="color:var(--lime)">five stages.</span></h2></div>
+    <div><div class="eyebrow">AI apps · the enforcement loop</div><h2>One loop, <span class="serif" style="color:var(--lime)">five stages.</span></h2></div>
     <p class="sub">Every request crosses four surfaces. Each is scanned, decided and recorded. Select a stage.</p>
   </div>
   <div class="stages" id="stages"></div>
@@ -211,7 +239,7 @@ footer a:hover{text-decoration:underline}
 <section id="capabilities"><div class="wrap">
   <div class="head2" style="margin-bottom:30px">
     <div><div class="eyebrow">Architecture</div><h2>The full <span class="serif">capability</span> map.</h2></div>
-    <p class="sub">Each package exposes focused capabilities. Select a card for the contract and a sample.</p>
+    <p class="sub">Four packages, one policy file. Select a card for the contract and a sample.</p>
   </div>
   <div class="legend"><span>Current</span><span class="pl">Planned</span><span class="cx">Context</span></div>
   <div class="cap" id="cap"></div>
@@ -220,7 +248,7 @@ footer a:hover{text-decoration:underline}
 
 <section class="dark-s" id="demo"><div class="wrap">
   <div class="head2">
-    <div><div class="eyebrow">Demo preview</div><h2>Four attacks. <span class="serif" style="color:var(--lime)">Four outcomes.</span></h2></div>
+    <div><div class="eyebrow">AI demo preview</div><h2>Four attacks. <span class="serif" style="color:var(--lime)">Four outcomes.</span></h2></div>
     <p class="sub">A preview of the demo scenarios. The real thing runs in your browser: no install, no sign-up.</p>
     <div class="btns" style="margin-top:22px"><a class="btn dark" href="/demo/" style="background:var(--lime);color:var(--ink);border-color:var(--lime)">Run it live →</a></div>
   </div>
@@ -232,9 +260,9 @@ footer a:hover{text-decoration:underline}
 
 <section id="start"><div class="wrap">
   <div class="head2" style="margin-bottom:40px">
-    <div><div class="eyebrow">Quick start</div><h2>Two lines. <span class="serif">Policy in config.</span></h2></div>
-    <p class="sub">Add one step to your chat client, then let security teams own the YAML. Tools not listed in the policy are blocked.</p>
-    <div class="btns" style="margin-top:22px"><code style="background:var(--ink);color:var(--lime);padding:12px 16px;font:13.5px 'JetBrains Mono',monospace">dotnet add package SentinelAI.Extensions.AI --prerelease</code><a class="btn" href="https://www.nuget.org/packages/SentinelAI.Extensions.AI">View on NuGet ↗</a></div>
+    <div><div class="eyebrow">Quick start</div><h2>A few lines. <span class="serif">Policy in config.</span></h2></div>
+    <p class="sub">Turn on the firewall, add one step to your chat client, then let security teams own the YAML. Tools not listed in the policy are blocked.</p>
+    <div class="btns" style="margin-top:22px"><code style="background:var(--ink);color:var(--lime);padding:12px 16px;font:13.5px 'JetBrains Mono',monospace">dotnet add package SentinelAI.ApiFirewall --prerelease</code><code style="background:var(--ink);color:var(--lime);padding:12px 16px;font:13.5px 'JetBrains Mono',monospace">dotnet add package SentinelAI.Extensions.AI --prerelease</code><a class="btn" href="https://www.nuget.org/profiles/Surya_Teja_Meesala">All packages on NuGet ↗</a></div>
   </div>
   <div class="two">
     <div><div class="fname">Program.cs</div>
@@ -242,14 +270,19 @@ footer a:hover{text-decoration:underline}
 builder.Services.<span class="k1">AddSentinelAI</span>()
     .<span class="k1">AddHttpContextCaller</span>();  <span class="c1">// who is calling</span>
 
+<span class="c1">// API firewall: every request and upload</span>
+app.<span class="k1">UseSentinelFirewall</span>();
+
+<span class="c1">// AI apps: the chat client and its tools</span>
 builder.Services.<span class="k1">AddChatClient</span>(innerClient)
     .<span class="k1">UseSentinel</span>()           <span class="c1">// before function invocation</span>
     .<span class="k1">UseFunctionInvocation</span>();</pre></div>
     <div><div class="fname">sentinel.yaml</div>
-<pre><span class="k1">prompt_injection</span>:
-  user_input: { action: <span class="s1">block</span>, threshold: <span class="s1">0.8</span> }
+<pre><span class="k1">api_firewall</span>:
+  <span class="k1">endpoints</span>:
+    - path: <span class="s1">/datasets/*/config</span>
+      uploads: { schema_file: <span class="s1">config.schema.json</span> }
 <span class="k1">secrets</span>: { action: <span class="s1">redact</span> }
-<span class="k1">pii</span>:     { action: <span class="s1">redact</span> }
 <span class="k1">tools</span>:
   <span class="k1">IssueRefund</span>:
     ownership_arg: <span class="s1">customerId</span>
@@ -264,10 +297,11 @@ builder.Services.<span class="k1">AddChatClient</span>(innerClient)
 <section id="compare" style="padding-top:20px"><div class="wrap">
   <div class="head2" style="margin-bottom:30px">
     <div><div class="eyebrow">Why Sentinel</div><h2>Not another scanner. <span class="serif">The missing layer.</span></h2></div>
-    <p class="sub">Strong tools already exist for detection, testing and observability. None put .NET-native enforcement and a tool firewall inside your app’s own AI pipeline.</p>
+    <p class="sub">Strong tools already exist for detection, testing and observability. None put endpoint-aware request inspection and an AI tool firewall inside your own .NET app.</p>
   </div>
   <div class="tw"><table>
     <tr><th>Tool</th><th>Strength</th><th>What Sentinel adds</th></tr>
+    <tr><td>Edge WAFs · OWASP CRS</td><td>Generic HTTP attack signatures</td><td class="us">Knows your endpoint schemas, uploads and archives; runs in-app</td></tr>
     <tr><td>Promptfoo</td><td>Red teaming and CI testing</td><td class="us">Production runtime enforcement</td></tr>
     <tr><td>LlamaFirewall</td><td>Runtime scanners</td><td class="us">Runs as a pluggable scanner behind policy</td></tr>
     <tr><td>NeMo Guardrails</td><td>Input, output and tool rails</td><td class="us">.NET-native, no Python service to run</td></tr>
@@ -279,21 +313,21 @@ builder.Services.<span class="k1">AddChatClient</span>(innerClient)
 <section id="roadmap" style="padding-top:20px"><div class="wrap">
   <div class="eyebrow">Roadmap</div><h2>Narrow first, <span class="serif">then wider.</span></h2>
   <div class="road">
-    <div><span class="v">v0.1 · preview</span><h3>In-app enforcement</h3><p>Core, Extensions.AI and AspNetCore packages: policy, scanners, tool firewall, approvals, OTel events.</p></div>
-    <div><span class="v">v0.2</span><h3>Scanner adapters</h3><p>PromptGuard, LlamaFirewall, Azure Content Safety, ONNX models.</p></div>
-    <div><span class="v">v0.3</span><h3>YARP gateway</h3><p>Protect AI apps you can’t modify, in front of any provider.</p></div>
-    <div><span class="v">Later</span><h3>Wider reach</h3><p>Semantic Kernel filters, approval UI, dashboards.</p></div>
+    <div><span class="v">v0.1 · released</span><h3>AI app protection</h3><p>Policy, scanners, tool firewall and approvals for IChatClient apps.</p></div>
+    <div><span class="v">v0.2 · now</span><h3>API firewall</h3><p>Schemas, injection, SSRF, traversal and upload inspection for any ASP.NET Core API.</p></div>
+    <div><span class="v">v0.3</span><h3>Agent traffic</h3><p>AI crawler and agent controls, rate and anomaly limits; scanner adapters for ML detectors.</p></div>
+    <div><span class="v">Later</span><h3>Wider reach</h3><p>YARP gateway for apps you can’t modify, Semantic Kernel filters, dashboards.</p></div>
   </div>
 </div></section>
 
 <div class="cta"><div class="wrap">
-  <h2>Put a checkpoint in front of <span class="serif">your agents.</span></h2>
-  <div class="btns"><code>dotnet add package SentinelAI.Extensions.AI --prerelease</code><a class="btn dark" href="/demo/">Try the live demo →</a><a class="btn" href="https://www.nuget.org/packages/SentinelAI.Extensions.AI">NuGet ↗</a><a class="btn" href="https://github.com/surya3524/sentinelai-net">Star on GitHub ↗</a></div>
+  <h2>Put a checkpoint in front of <span class="serif">your APIs and agents.</span></h2>
+  <div class="btns"><code>dotnet add package SentinelAI.ApiFirewall --prerelease</code><a class="btn dark" href="#firewall">API firewall →</a><a class="btn" href="/demo/">AI demo</a><a class="btn" href="https://www.nuget.org/profiles/Surya_Teja_Meesala">NuGet ↗</a><a class="btn" href="https://github.com/surya3524/sentinelai-net">Star on GitHub ↗</a></div>
 </div></div>
 
 <footer><div class="wrap">
   <span>© 2026 SentinelAI.NET · Open infrastructure for secure, observable .NET AI.</span>
-  <span><a href="https://github.com/surya3524/sentinelai-net">GitHub</a> · <a href="https://www.nuget.org/packages/SentinelAI.Extensions.AI">NuGet</a> · <a href="#start">Docs</a> · <a href="#roadmap">Roadmap</a></span>
+  <span><a href="https://github.com/surya3524/sentinelai-net">GitHub</a> · <a href="https://www.nuget.org/profiles/Surya_Teja_Meesala">NuGet</a> · <a href="#start">Docs</a> · <a href="#roadmap">Roadmap</a></span>
 </div></footer>
 
 <script>
@@ -339,7 +373,7 @@ const caps=[
  ['Decide','SentinelAI.Core','current','Policy engine',['YAML policy','Thresholds per source','Audit mode','OpenTelemetry events'],'One decision point for every surface.','ALLOW | REDACT | QUARANTINE | REQUIRE_APPROVAL | BLOCK'],
  ['Guard','SentinelAI.Core','current','Tool-call firewall',['Default deny','Ownership checks','Amount limits','Human approval'],'Stop dangerous actions, not just bad words.','IssueRefund(orderId: O-5001, amount: 4999)\n=> BLOCK: amount=4999 exceeds hard limit 500'],
  ['Detect','SentinelAI.Core','current','Scanners',['Injection rules','Secrets and PII','Exfiltration URLs','HTTP adapter for ML models'],'Bring your own detectors.','public interface IAiSecurityScanner {\n  Task<SecurityScanResult> ScanAsync(\n    SecurityScanContext ctx, CancellationToken ct);\n}'],
- ['Proxy','SentinelAI.Gateway','planned','YARP gateway',['Provider routing','No app changes','Streaming','Budget limits'],'Protect apps you cannot modify.','App -> Sentinel Gateway -> OpenAI | Azure | Anthropic | Bedrock']
+ ['Inspect','SentinelAI.ApiFirewall','current','API firewall',['Endpoint schemas','Injection detectors','SSRF and traversal','Upload and zip inspection'],'Stop code-execution payloads before anything processes them.','builder.Services.AddSentinelAI();\napp.UseSentinelFirewall();\n\n# sentinel.yaml\napi_firewall:\n  endpoints:\n    - path: /datasets/*/config\n      uploads: { schema_file: config.schema.json }']
 ];
 const cEl=$('#cap'),cd=$('#capDetail');
 function pickCap(i){
